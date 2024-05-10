@@ -23,11 +23,13 @@ public class Main {
          clientSocket = serverSocket.accept();
            OutputStream writer = clientSocket.getOutputStream();
            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-           System.out.println(reader.readLine());
-           writer.write("+PONG\r\n".getBytes());
-           writer.flush();
-
+           String input;
+           while ((input = reader.readLine()) != null ){
+               if (input.equalsIgnoreCase("PING")){
+                   writer.write("+PONG\r\n".getBytes());
+                   writer.flush();
+               }
+           }
        } catch (IOException e) {
          System.out.println("IOException: " + e.getMessage());
        } finally {
