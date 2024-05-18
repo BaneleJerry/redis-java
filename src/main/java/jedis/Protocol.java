@@ -45,38 +45,14 @@ public class Protocol {
         resp[index] = LF_BYTE;
         return resp;
     }
-
-    // *2$4ECHO$3hey
-    public String[] parseCommand(String rawCMD) {
-        byte[] parts = getParts(rawCMD);
-        String[] args = new String[parts.length];
-        for (int i = 0; i < parts.length; i++) {
-
-        }
-
-        return null;
+    
+    public byte[] bulkStringResp(String args){
+        return bulkStringResp(args.getBytes());
     }
 
-    private static byte[] getParts(String input) {
-        List<Byte> byteList = new ArrayList<>();
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            if (c != CR_BYTE && c != LF_BYTE) {
-                byteList.add((byte) c);
-            }
-        }
-
-        // Convert the list to a byte array
-        byte[] bytes = new byte[byteList.size()];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = byteList.get(i);
-        }
-
-        return bytes;
+    public byte[] simpleStringResp(String args){
+        return simpleStringResp(args.getBytes());
     }
 
-    public static void main(String[] args) {
-        String t = "*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n";
-        System.out.println(Arrays.toString(getParts(t)));
-    }
+    
 }

@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import jedis.memory.DatabasesManager;
+
 public class Main {
     public static void main(String[] args) {
         System.out.println("Logs from your program will appear here!");
@@ -11,7 +13,7 @@ public class Main {
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
-
+            
             while (true) {
                 Socket clientSocket = serverSocket.accept(); // Wait for connection from client
                 Thread t = new Thread(new HandleClients(clientSocket));

@@ -1,4 +1,5 @@
 import jedis.Protocol;
+import jedis.memory.DatabasesManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,7 +31,8 @@ public class HandleClients implements Runnable {
                 
                 if (parts.length > 2) {
                     String cmd = parts[2];
-                    System.out.println(cmd);
+                    System.out.println(Arrays.toString(parts));
+                    // System.out.println(cmd);
                     switch (cmd.toUpperCase()) {
                         case "PING":
                             writer.write(protocol.simpleStringResp("PONG".getBytes()));
@@ -38,6 +40,21 @@ public class HandleClients implements Runnable {
 
                         case "ECHO":
                             writer.write(protocol.bulkStringResp(parts[parts.length -1].getBytes()));
+                            break;
+
+                        case "SET":
+                            DatabasesManager.DEFAULT_DB.set(parts[4],parts[6]);
+                            writer.write(protocol.simpleStringResp("OK"));
+                            break;    
+                        
+                        case "GET":
+                            String output = DatabasesManager.DEFAULT_DB.get(parts[4]);
+                            writer.write(protocol.simpleStringResp(output));
+                            break;
+                        default:
+                            clientSocket.getOutputStream().write(
+                                    "-ERR unknown command\r\n".getBytes());
+                            break;
                     }
                     writer.flush();
                 }
