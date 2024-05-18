@@ -1,25 +1,44 @@
+import jedis.Protocol;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class HandleClients implements Runnable {
 
     private final Socket clientSocket;
+    private final Protocol protocol;
+
     public HandleClients(Socket clientSocket) {
         this.clientSocket = clientSocket;
+        protocol = new Protocol();
     }
 
     @Override
     public void run() {
         try {
             OutputStream writer = clientSocket.getOutputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String input;
-            while ((input = reader.readLine()) != null) {
-                if (input.equalsIgnoreCase("PING")) {
-                    writer.write("+PONG\r\n".getBytes());
+            byte[] input = new byte[1024];
+            while (clientSocket.isConnected()) {
+                clientSocket.getInputStream().read(input);
+                String req = new String(input).trim();
+                String[] parts = req.split("\r\n");
+                
+                
+                if (parts.length > 2) {
+                    String cmd = parts[2];
+                    System.out.println(cmd);
+                    switch (cmd.toUpperCase()) {
+                        case "PING":
+                            writer.write(protocol.simpleStringResp("PONG".getBytes()));
+                            break;
+
+                        case "ECHO":
+                            writer.write(protocol.bulkStringResp(parts[parts.length -1].getBytes()));
+                    }
                     writer.flush();
                 }
             }
