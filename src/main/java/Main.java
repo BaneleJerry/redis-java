@@ -9,7 +9,7 @@ public class Main {
         System.out.println("Logs from your program will appear here!");
 
         ServerSocket serverSocket = null;
-        int port = 6379;
+        int port = (args != null && args.length > 1) ? Integer.parseInt(args[1]) : 6379;
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
