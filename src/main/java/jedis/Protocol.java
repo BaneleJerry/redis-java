@@ -30,6 +30,8 @@ public class Protocol {
     }
 
     public byte[] bulkStringResp(byte[] args) {
+        // $-1\r\n
+        
         int length = args.length;
         String lengthStr = Integer.toString(length);
         int respLength = lengthStr.length() + length + 5;
@@ -47,6 +49,9 @@ public class Protocol {
     }
     
     public byte[] bulkStringResp(String args){
+        if (args == null) {
+            return new byte[] { DOLLAR_BYTE, (byte) '-', (byte) '1', CR_BYTE, LF_BYTE };
+        }
         return bulkStringResp(args.getBytes());
     }
 

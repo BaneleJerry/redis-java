@@ -43,13 +43,19 @@ public class HandleClients implements Runnable {
                             break;
 
                         case "SET":
+                            if(parts.length > 7){
+                                DatabasesManager.DEFAULT_DB.set(parts[4],parts[6],Long.parseLong(parts[10]));
+                                writer.write(protocol.bulkStringResp("OK"));
+                                break;
+                            }
                             DatabasesManager.DEFAULT_DB.set(parts[4],parts[6]);
                             writer.write(protocol.simpleStringResp("OK"));
+                            
                             break;    
                         
                         case "GET":
                             String output = DatabasesManager.DEFAULT_DB.get(parts[4]);
-                            writer.write(protocol.simpleStringResp(output));
+                            writer.write(protocol.bulkStringResp(output));
                             break;
                         default:
                             clientSocket.getOutputStream().write(
