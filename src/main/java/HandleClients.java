@@ -27,8 +27,7 @@ public class HandleClients implements Runnable {
                 clientSocket.getInputStream().read(input);
                 String req = new String(input).trim();
                 String[] parts = req.split("\r\n");
-                
-                
+
                 if (parts.length > 2) {
                     String cmd = parts[2];
                     System.out.println(Arrays.toString(parts));
@@ -39,24 +38,27 @@ public class HandleClients implements Runnable {
                             break;
 
                         case "ECHO":
-                            writer.write(protocol.bulkStringResp(parts[parts.length -1].getBytes()));
+                            writer.write(protocol.bulkStringResp(parts[parts.length - 1].getBytes()));
                             break;
 
                         case "SET":
-                            if(parts.length > 7){
-                                DatabasesManager.DEFAULT_DB.set(parts[4],parts[6],Long.parseLong(parts[10]));
+                            if (parts.length > 7) {
+                                DatabasesManager.DEFAULT_DB.set(parts[4], parts[6], Long.parseLong(parts[10]));
                                 writer.write(protocol.bulkStringResp("OK"));
                                 break;
                             }
-                            DatabasesManager.DEFAULT_DB.set(parts[4],parts[6]);
+                            DatabasesManager.DEFAULT_DB.set(parts[4], parts[6]);
                             writer.write(protocol.simpleStringResp("OK"));
-                            
-                            break;    
-                        
+
+                            break;
+
                         case "GET":
                             String output = DatabasesManager.DEFAULT_DB.get(parts[4]);
                             writer.write(protocol.bulkStringResp(output));
                             break;
+
+                        case "INFO":
+                            writer.write(protocol.bulkStringResp("#Replication \n  role:master"));
                         default:
                             clientSocket.getOutputStream().write(
                                     "-ERR unknown command\r\n".getBytes());
