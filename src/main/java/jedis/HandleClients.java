@@ -1,9 +1,7 @@
-import jedis.Protocol;
+package jedis;
 import jedis.memory.DatabasesManager;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
@@ -12,10 +10,12 @@ public class HandleClients implements Runnable {
 
     private final Socket clientSocket;
     private final Protocol protocol;
+    private final Jedis jedis;
 
-    public HandleClients(Socket clientSocket) {
+    public HandleClients(Socket clientSocket, Jedis jedis) {
         this.clientSocket = clientSocket;
         protocol = new Protocol();
+        this.jedis = jedis;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class HandleClients implements Runnable {
                             break;
 
                         case "INFO":
-                            writer.write(protocol.bulkStringResp("#Replication \n  role:master"));
+                            writer.write(protocol.bulkStringResp("#Replication role:" + jedis.replicaState()));
                         default:
                             clientSocket.getOutputStream().write(
                                     "-ERR unknown command\r\n".getBytes());
