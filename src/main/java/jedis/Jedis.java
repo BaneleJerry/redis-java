@@ -1,5 +1,6 @@
 package jedis;
 
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
@@ -18,6 +19,7 @@ public class Jedis {
         this.isMaster = isMaster;
         this.replicationID = (this.isMaster) ? generateReplicationID() : "";
         this.OffSet = 0;
+
     }
 
     // Constructor with only port parameter (default isMaster to false)
@@ -27,7 +29,12 @@ public class Jedis {
 
     // Default constructor
     public Jedis() {
-        this(0, true);
+        this(6379, true);
+    }
+
+    public Jedis(int port, int masterPort, String masterHost){
+        this(port, false);
+        syncWithMaster(masterHost,masterPort);
     }
 
     public void startServer() {
@@ -75,6 +82,18 @@ public class Jedis {
             sb.append(CHARACTERS.charAt(randomIndex));
         }
         return sb.toString();
+    }
+
+    private void syncWithMaster(String host, int port){
+        try(Socket slaveSocket = new Socket(host,port);) {
+            OutputStream os = slaveSocket.getOutputStream();
+            String handShakeMsg = "*1\r\n$4\r\nping\r\n";
+            os.write(handShakeMsg.getBytes());
+            os.flush();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public int getPORT() {
