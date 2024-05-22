@@ -1,5 +1,8 @@
 package jedis;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -84,14 +87,33 @@ public class Jedis {
         return sb.toString();
     }
 
-    private void syncWithMaster(String host, int port){
-        try(Socket slaveSocket = new Socket(host,port);) {
+    public void syncWithMaster(String host, int port) {
+        try (Socket slaveSocket = new Socket(host, port)) {
             OutputStream os = slaveSocket.getOutputStream();
-            String handShakeMsg = "*1\r\n$4\r\nping\r\n";
-            os.write(handShakeMsg.getBytes());
+            InputStream is = slaveSocket.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+            // Sending PING command
+            String pingMsg = "*1\r\n$4\r\nPING\r\n";
+            os.write(pingMsg.getBytes());
             os.flush();
-        }
-        catch (Exception e){
+            System.out.println("Sent: PING");
+            System.out.println("Response: " + reader.readLine());
+
+            // Sending REPLCONF listening-port
+            String replConfListeningPortMsg = "*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n6380\r\n";
+            os.write(replConfListeningPortMsg.getBytes());
+            os.flush();
+            System.out.println("Sent: REPLCONF listening-port 6380");
+            System.out.println("Response: " + reader.readLine());
+
+            //Uncomment below to send REPLCONF capa psync2 if needed
+             String replConfCapaMsg = "*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n";
+             os.write(replConfCapaMsg.getBytes());
+             os.flush();
+             System.out.println("Sent: REPLCONF capa psync2");
+             System.out.println("Response: " + reader.readLine());
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
