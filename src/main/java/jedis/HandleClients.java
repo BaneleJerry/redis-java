@@ -58,7 +58,10 @@ public class HandleClients implements Runnable {
                             break;
 
                         case "INFO":
-                            writer.write(protocol.bulkStringResp("#Replication role:" + jedis.replicaState()));
+                            String replicationInfo = "#Replication role:" + jedis.replicaState()
+                                    + " \nmaster_replid:" + jedis.getReplicationID()
+                                    + "\nmaster_repl_offset:" + jedis.getOffSet();
+                            writer.write(protocol.bulkStringResp(replicationInfo));
                         default:
                             clientSocket.getOutputStream().write(
                                     "-ERR unknown command\r\n".getBytes());

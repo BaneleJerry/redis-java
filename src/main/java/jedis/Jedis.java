@@ -2,17 +2,22 @@ package jedis;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Random;
 
 public class Jedis {
     private int PORT;
     private final int PORT_DEFAULT = 6379;
     private final String HOST = "localhost";
-    public boolean isMaster;
+    private boolean isMaster;
+    private int OffSet;
+    private String replicationID;
 
     // Constructor with port and isMaster parameters
     public Jedis(int PORT, boolean isMaster) {
         this.PORT = PORT;
         this.isMaster = isMaster;
+        this.replicationID = (this.isMaster) ? generateReplicationID() : "";
+        this.OffSet = 0;
     }
 
     // Constructor with only port parameter (default isMaster to false)
@@ -58,6 +63,20 @@ public class Jedis {
         }
     }
 
+    private String generateReplicationID(){
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        final int STRING_LENGTH = 40;
+
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(STRING_LENGTH);
+
+        for (int i = 0; i < STRING_LENGTH; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(randomIndex));
+        }
+        return sb.toString();
+    }
+
     public int getPORT() {
         return PORT;
     }
@@ -83,5 +102,13 @@ public class Jedis {
             return "master";
         }
         return "slave";
+    }
+
+    public String getReplicationID() {
+        return replicationID;
+    }
+
+    public int getOffSet() {
+        return OffSet;
     }
 }
