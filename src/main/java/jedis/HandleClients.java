@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class HandleClients implements Runnable {
 
@@ -70,7 +71,12 @@ public class HandleClients implements Runnable {
 
                         case "PSYNC":
                             String msg = "FULLRESYNC " + jedis.getReplicationID() + " " + jedis.getOffSet();
-                                    writer.write(protocol.simpleStringResp(msg.getBytes()));
+                            writer.write(protocol.simpleStringResp(msg.getBytes()));
+
+                            String fileContents = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
+                            byte[] bytes = Base64.getDecoder().decode(fileContents);
+                            writer.write(("$" + bytes.length + "\r\n").getBytes());
+                            writer.write(bytes);
                             break;
                         default:
                             clientSocket.getOutputStream().write(
