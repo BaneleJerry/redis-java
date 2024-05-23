@@ -69,7 +69,7 @@ public class HandleClients implements Runnable {
                             break;
 
                         case "PSYNC":
-                            String msg = "FULLSYNC " + jedis.getReplicationID() + " " + jedis.getOffSet();
+                            String msg = "FULLRESYNC " + jedis.getReplicationID() + " " + jedis.getOffSet();
                                     writer.write(protocol.simpleStringResp(msg.getBytes()));
                             break;
                         default:
