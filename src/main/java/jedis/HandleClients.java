@@ -66,6 +66,12 @@ public class HandleClients implements Runnable {
 
                         case "REPLCONF":
                             writer.write(protocol.simpleStringResp("OK"));
+                            break;
+
+                        case "PSYNC":
+                            String msg = "FULLSYNC " + jedis.getReplicationID() + " " + jedis.getOffSet();
+                                    writer.write(protocol.simpleStringResp(msg.getBytes()));
+                            break;
                         default:
                             clientSocket.getOutputStream().write(
                                     "-ERR unknown command\r\n".getBytes());

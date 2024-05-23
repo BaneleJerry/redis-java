@@ -113,6 +113,16 @@ public class Jedis {
              os.flush();
              System.out.println("Sent: REPLCONF capa psync2");
              System.out.println("Response: " + reader.readLine());
+
+             // PSYNC
+            String psyncMsg= "*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n";
+            os.write(psyncMsg.getBytes());
+            os.flush();
+            System.out.println("Sent: PSYNC");
+            System.out.println("Response: " + reader.readLine());
+
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
